@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理员登录</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans">
+  <section class="flex items-center justify-center min-h-screen">
+    <div class="bg-white shadow-md rounded-xl p-8 w-full max-w-sm">
+      <h1 class="text-2xl font-bold text-center mb-6">管理员登录</h1>
+      <form id="loginForm" class="space-y-4">
+        <input id="username" type="text" placeholder="用户名" class="w-full border p-2 rounded" required>
+
+        <div class="relative">
+          <input id="password" type="password" placeholder="密码" class="w-full border p-2 rounded pr-10" required>
+          <button type="button" id="togglePassword" class="absolute right-2 top-2 text-gray-500">
+            <i id="eyeIcon" class="fa fa-eye"></i>
+          </button>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">登录</button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    // 登录逻辑
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (username === "wuyongmu" && password === "WYM22222") {
+        localStorage.setItem("role", "admin");
+      } else {
+        localStorage.setItem("role", "guest");
+      }
+      window.location.href = "cases.html";
+    });
+
+    // 密码显示/隐藏切换
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      eyeIcon.className = type === "password" ? "fa fa-eye" : "fa fa-eye-slash";
+    });
+  </script>
+</body>
+</html>

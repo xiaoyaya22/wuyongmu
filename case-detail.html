@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作品详情 - 个人作品集</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    .thumbnail-active { border-color: #3b82f6; opacity: 1; }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans">
+  <!-- 导航栏 -->
+  <header class="sticky top-0 bg-white/90 backdrop-blur-sm shadow-sm z-50">
+    <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="index.html" id="siteTitle" class="text-2xl font-bold text-gray-800">游客</a>
+      <div class="flex space-x-4 items-center">
+        <a href="index.html" class="text-gray-600 hover:text-gray-900 transition">首页</a>
+        <a href="cases.html" class="text-gray-600 hover:text-gray-900 transition">案例展示</a>
+        <a href="index.html#contact" class="text-gray-600 hover:text-gray-900 transition">联系我</a>
+        <a href="admin-login.html" class="text-gray-600 hover:text-gray-900 transition">
+          <i class="fa fa-lock mr-1"></i>管理员登录
+        </a>
+        <!-- 退出管理员按钮 -->
+        <button id="logoutBtn" class="text-gray-600 hover:text-gray-900 transition hidden flex items-center">
+          <i class="fa fa-sign-out mr-1"></i>退出管理员模式
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- 作品详情 -->
+  <section class="container mx-auto px-4 py-12">
+    <div class="flex items-center text-gray-500 mb-8">
+      <a href="index.html" class="hover:text-blue-600 transition">首页</a>
+      <i class="fa fa-angle-right mx-2 text-xs"></i>
+      <a href="cases.html" class="hover:text-blue-600 transition">案例展示</a>
+      <i class="fa fa-angle-right mx-2 text-xs"></i>
+      <span id="workBreadcrumb" class="text-gray-700">作品详情</span>
+    </div>
+
+    <div class="mb-8">
+      <h1 id="workTitle" class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">作品标题</h1>
+      <span id="workCategory" class="px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-800">作品分类</span>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md p-4 md:p-6 mb-8">
+      <div class="h-80 md:h-96 overflow-hidden mb-4 rounded-lg">
+        <img id="mainWorkImage" src="https://via.placeholder.com/800x500?text=作品主图" alt="作品主图" class="w-full h-full object-contain">
+      </div>
+      <div id="thumbnailList" class="flex space-x-4 overflow-x-auto pb-2"></div>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 shadow-md mb-8">
+      <h3 class="text-lg font-semibold mb-4 border-b pb-2">项目详情</h3>
+      <div class="space-y-3 text-gray-700">
+        <p><span class="font-medium">项目类型：</span><span id="workType">项目类型</span></p>
+        <p><span class="font-medium">使用软件：</span><span id="workSoftware">使用软件</span></p>
+        <p><span class="font-medium">完成时间：</span><span id="workDate">完成时间</span></p>
+        <p><span class="font-medium">项目描述：</span><span id="workDescription">项目描述</span></p>
+      </div>
+    </div>
+
+    <div class="mt-6 flex space-x-4">
+      <a href="cases.html" class="inline-flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition">
+        <i class="fa fa-arrow-left mr-2"></i> 返回作品列表
+      </a>
+      <button id="deleteBtn" class="inline-flex items-center px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition hidden">
+        <i class="fa fa-trash mr-2"></i> 删除作品
+      </button>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-white py-8 mt-8">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2023 个人作品集</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const role = localStorage.getItem("role") || "guest";
+
+      // 站点标题
+      const siteTitle = document.getElementById("siteTitle");
+      siteTitle.textContent = role === "admin" ? "吴勇木" : "游客";
+
+      // 退出管理员按钮
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (role === "admin") {
+        logoutBtn.classList.remove("hidden");
+        logoutBtn.addEventListener("click", () => {
+          localStorage.setItem("role", "guest");
+          window.location.href = "cases.html";
+        });
+      }
+
+      // 获取作品信息
+      const urlParams = new URLSearchParams(window.location.search);
+      const workId = urlParams.get('id');
+      const works = JSON.parse(localStorage.getItem('works')) || {};
+      const work = works[workId];
+      if (!work) {
+        window.location.href = 'cases.html';
+        return;
+      }
+
+      // 渲染作品详情
+      document.getElementById('workTitle').textContent = work.title;
+      document.getElementById('workBreadcrumb').textContent = work.title;
+      document.getElementById('workCategory').textContent = work.category;
+      document.getElementById('workCategory').className = `px-4 py-2 rounded-full text-sm font-medium ${work.categoryClass}`;
+      document.getElementById('workType').textContent = work.details.type || "未填写";
+      document.getElementById('workSoftware').textContent = work.details.software || "未填写";
+      document.getElementById('workDate').textContent = work.details.date || "未填写";
+      document.getElementById('workDescription').textContent = work.details.description || "无描述";
+
+      // 主图和缩略图
+      const mainImage = document.getElementById('mainWorkImage');
+      mainImage.src = work.mainImage;
+      mainImage.alt = work.title;
+
+      const thumbnailList = document.getElementById('thumbnailList');
+      thumbnailList.innerHTML = '';
+      work.thumbnails.forEach((thumb, index) => {
+        if (!thumb) return;
+        const div = document.createElement("div");
+        div.className = `w-20 h-16 rounded-md border-2 overflow-hidden cursor-pointer transition ${index===0 ? 'border-blue-600 opacity-100' : 'border-gray-200 opacity-70 hover:opacity-100'}`;
+        div.innerHTML = `<img src="${thumb}" class="w-full h-full object-cover">`;
+        div.addEventListener("click", () => {
+          document.querySelectorAll("#thumbnailList > div").forEach(el=>{
+            el.classList.remove("border-blue-600","opacity-100");
+            el.classList.add("border-gray-200","opacity-70");
+          });
+          div.classList.add("border-blue-600","opacity-100");
+          div.classList.remove("border-gray-200","opacity-70");
+          mainImage.src = thumb;
+        });
+        thumbnailList.appendChild(div);
+      });
+
+      // 管理员显示删除按钮
+      if (role === "admin") {
+        const deleteBtn = document.getElementById("deleteBtn");
+        deleteBtn.classList.remove("hidden");
+        deleteBtn.addEventListener("click", () => {
+          if (confirm("确定要删除这个作品吗？")) {
+            delete works[workId];
+            localStorage.setItem("works", JSON.stringify(works));
+            alert("作品已删除！");
+            window.location.href = "cases.html";
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
